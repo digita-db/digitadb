@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DigitaDB — Dashboard Vendite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Mulish:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="digitadb.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-mark">D</div>
+    <span class="sb-name">DigitaDB</span>
+    <button class="sb-toggle" id="sbToggle">‹</button>
+  </div>
+
+  <div class="sb-sect">Principale</div>
+  <div class="nav on" data-view="dashboard"><span class="nicon">◈</span><span class="nlabel">Dashboard</span></div>
+  <div class="nav" data-view="insert"><span class="nicon">＋</span><span class="nlabel">Inserisci PC</span></div>
+  <div class="nav" data-view="rank"><span class="nicon">🏆</span><span class="nlabel">Classifica</span></div>
+  <div class="nav" data-view="history"><span class="nicon">◫</span><span class="nlabel">Storico</span></div>
+
+  <div class="sb-sect">Amministrazione</div>
+  <div class="nav" data-view="admin"><span class="nicon">⬔</span><span class="nlabel">Admin</span><span class="nbadge" id="adminBadge">!</span></div>
+
+  <div class="sb-footer">
+    <div class="sb-user" id="sbUserArea">
+      <div class="sb-ava" id="sbAva" style="background:var(--cyan)">?</div>
+      <div class="sb-uinfo">
+        <div class="sb-uname" id="sbUname">Seleziona utente</div>
+        <div class="sb-urole" id="sbUrole">—</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div id="tbTitle">Dashboard</div>
+    <div class="tb-right">
+      <div class="tb-chip"><span class="live-dot"></span> Live</div>
+      <div class="tb-chip" id="tbMonth">Aprile 2026</div>
+      <div class="tb-chip" id="tbUser">Utente: —</div>
+    </div>
+  </div>
+
+  <!-- ─── DASHBOARD ─── -->
+  <div class="view on" id="view-dashboard">
+    <div class="kpi-grid">
+      <div class="kpi" style="--kc:var(--cyan)">
+        <div class="kpi-lbl">PC completati (mese)</div>
+        <div class="kpi-val" id="kMese">0</div>
+        <span class="kpi-delta" id="kMeseDelta">—</span>
+        <div class="kpi-sub" id="kMeseSub"></div>
+        <div class="prog-wrap"><div class="prog-fill" id="kMeseProg" style="background:var(--cyan);width:0%"></div></div>
+      </div>
+      <div class="kpi" style="--kc:var(--gold)">
+        <div class="kpi-lbl">PC totali (anno)</div>
+        <div class="kpi-val" id="kAnno">0</div>
+        <span class="kpi-delta up" id="kAnnoDelta">↑ YTD</span>
+        <div class="kpi-sub" id="kAnnoSub"></div>
+        <div class="prog-wrap"><div class="prog-fill" id="kAnnoProg" style="background:var(--gold);width:0%"></div></div>
+      </div>
+      <div class="kpi" style="--kc:var(--purple)">
+        <div class="kpi-lbl">Team attivo</div>
+        <div class="kpi-val" id="kTeam">0</div>
+        <span class="kpi-delta" id="kTeamDelta">persone</span>
+        <div class="kpi-sub">con almeno 1 PC questo mese</div>
+      </div>
+      <div class="kpi" style="--kc:var(--green)">
+        <div class="kpi-lbl">Obiettivo mensile</div>
+        <div class="kpi-val" id="kObj">0%</div>
+        <span class="kpi-delta" id="kObjDelta">—</span>
+        <div class="kpi-sub" id="kObjSub"></div>
+        <div class="prog-wrap"><div class="prog-fill" id="kObjProg" style="background:var(--green);width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="charts-row cc2">
+      <div class="chart-card">
+        <div class="cc-head">
+          <div><div class="cc-title">PC completati per mese</div><div class="cc-sub">Andamento 2026</div></div>
+          <div class="cc-legend">
+            <span><span class="ldot" style="background:var(--cyan)"></span>2026</span>
+            <span><span class="ldot" style="background:var(--s4)"></span>Obiettivo</span>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:200px"><canvas id="cMonthly" role="img" aria-label="PC completati per mese 2026">Trend mensile.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="cc-head"><div><div class="cc-title">Distribuzione per ruolo</div><div class="cc-sub">Mese corrente</div></div></div>
+        <div id="roleLegend" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:var(--text2)"></div>
+        <div style="position:relative;width:100%;height:170px"><canvas id="cRole" role="img" aria-label="Distribuzione PC per ruolo">PC per ruolo.</canvas></div>
+      </div>
+    </div>
+
+    <div class="charts-row cc2">
+      <div class="chart-card">
+        <div class="cc-head"><div><div class="cc-title">Top performer mese</div><div class="cc-sub" id="dashTopSub">Classifica attuale</div></div></div>
+        <div id="dashTop"></div>
+      </div>
+      <div class="chart-card">
+        <div class="cc-head"><div><div class="cc-title">Andamento settimanale</div><div class="cc-sub">Inserimenti ultimi 28 giorni</div></div></div>
+        <div style="position:relative;width:100%;height:170px"><canvas id="cWeekly" role="img" aria-label="Andamento settimanale">Andamento settimanale.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── INSERT ─── -->
+  <div class="view" id="view-insert">
+    <div class="insert-card">
+      <div class="ic-header">
+        <div class="ic-icon">💻</div>
+        <div class="ic-title">Inserisci PC completato</div>
+        <div class="ic-sub">Registra un nuovo PC nel sistema</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Il tuo nome</label>
+        <select class="form-select" id="insUser">
+          <option value="">— Seleziona il tuo nome —</option>
+        </select>
+      </div>
+      <div class="form-row r2">
+        <div class="form-group">
+          <label class="form-label">Tipo PC</label>
+          <select class="form-select" id="insTipo">
+            <option value="">— Seleziona —</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Workstation">Workstation</option>
+            <option value="Server">Server</option>
+            <option value="All-in-One">All-in-One</option>
+            <option value="Mini PC">Mini PC</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <select class="form-select" id="insBrand">
+            <option value="">— Seleziona —</option>
+            <option>Dell</option><option>HP</option><option>Lenovo</option>
+            <option>Apple</option><option>ASUS</option><option>Acer</option>
+            <option>MSI</option><option>Samsung</option><option>Custom</option><option>Altro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row r2">
+        <div class="form-group">
+          <label class="form-label">Modello</label>
+          <input class="form-input" id="insModel" placeholder="es. ThinkPad X1 Carbon" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Numero seriale</label>
+          <input class="form-input" id="insSerial" placeholder="es. SN-2024-XXXX" style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.05em" />
+        </div>
+      </div>
+      <div class="form-row r2">
+        <div class="form-group">
+          <label class="form-label">Data completamento</label>
+          <input class="form-input" id="insDate" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Note (opzionale)</label>
+          <input class="form-input" id="insNote" placeholder="Eventuali note..." />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+        <button class="btn btn-ghost" id="insReset">Azzera</button>
+        <button class="btn btn-primary" id="insSubmit">✓ Registra PC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RANK ─── -->
+  <div class="view" id="view-rank">
+    <div class="sh">
+      <div class="sh-title">Classifica</div>
+      <div class="fbar">
+        <div class="fchip on" data-period="month" id="rankPeriodMonth">Mensile</div>
+        <div class="fchip" data-period="year" id="rankPeriodYear">Annuale</div>
+        <div id="rankMonthSelector" style="display:flex;gap:6px"></div>
+      </div>
+    </div>
+    <div class="podium" id="podium"></div>
+    <div class="tbl-wrap">
+      <table class="rank-table">
+        <thead><tr>
+          <th style="width:50px">Pos.</th>
+          <th>Nome</th>
+          <th>Ruolo</th>
+          <th>PC completati</th>
+          <th>Obiettivo</th>
+          <th>% Obiettivo</th>
+          <th>Trend</th>
+        </tr></thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── HISTORY ─── -->
+  <div class="view" id="view-history">
+    <div class="sh"><div class="sh-title">Storico mensile</div></div>
+    <div class="month-selector" id="histMonthSel"></div>
+    <div id="histContent"></div>
+  </div>
+
+  <!-- ─── ADMIN ─── -->
+  <div class="view" id="view-admin">
+    <div id="adminGate">
+      <div class="gate-box">
+        <div class="gate-ico">🔐</div>
+        <div class="gate-title">Area Amministratore</div>
+        <div class="gate-sub">Accesso riservato. La sessione admin si chiude automaticamente all'uscita da questa sezione.</div>
+        <input class="gate-inp" id="gatePwd" type="password" placeholder="••••••••" maxlength="24" />
+        <button class="gate-btn" id="gateBtn">Accedi come Admin</button>
+        <div class="gate-err" id="gateErr">Password non corretta. Riprova.</div>
+        <div class="gate-hint">Password demo: <code style="color:var(--cyan);font-size:11px">admin2026</code></div>
+      </div>
+    </div>
+    <div id="adminPanel" style="display:none">
+      <div class="admin-banner">⚡ Sessione admin attiva — si chiude automaticamente all'uscita da questa sezione.</div>
+      <div class="admin-tabs">
+        <div class="atab on" data-atab="orders">Ordini / PC</div>
+        <div class="atab" data-atab="users">Utenti</div>
+        <div class="atab" data-atab="goals">Obiettivi</div>
+        <div class="atab" data-atab="config">Configurazione</div>
+      </div>
+      <div id="atab-orders"></div>
+      <div id="atab-users" style="display:none"></div>
+      <div id="atab-goals" style="display:none"></div>
+      <div id="atab-config" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-title" id="modalTitle">Modifica</div>
+    <div id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modalCancel">Annulla</button>
+      <button class="btn btn-primary" id="modalOk">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECURITY CONFIRM MODAL -->
+<div id="secOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--s2);border:1px solid rgba(224,92,114,.3);border-radius:18px;padding:32px 36px;width:440px;max-width:95vw;animation:fadeUp .2s ease">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="width:40px;height:40px;border-radius:11px;background:var(--red2);border:1px solid rgba(224,92,114,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚠</div>
+      <div id="secTitle" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--red);letter-spacing:-.3px"></div>
+    </div>
+    <div id="secDesc" style="font-size:13.5px;color:var(--text2);line-height:1.6;margin-bottom:20px;padding:14px;background:var(--s3);border-radius:9px;border:1px solid var(--border)"></div>
+    <div id="secExtraWarn" style="display:none;background:rgba(224,92,114,.08);border:1px solid rgba(224,92,114,.2);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--red);margin-bottom:16px;line-height:1.5"></div>
+    <div style="background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Codice di sicurezza monouso</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div id="secCode" style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;letter-spacing:.18em;color:var(--red);background:var(--s4);padding:8px 16px;border-radius:8px;border:1px solid rgba(224,92,114,.2)"></div>
+        <div style="font-size:11.5px;color:var(--text3);line-height:1.4;max-width:160px">Digita esattamente questo codice per confermare l'eliminazione</div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:7px">Inserisci il codice</div>
+      <input id="secInput" type="text" placeholder="Digita il codice qui..." autocomplete="off" spellcheck="false"
+        style="width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.12em;outline:none;transition:border-color .14s" />
+      <div id="secError" style="font-size:12px;color:var(--red);margin-top:6px;opacity:0;transition:opacity .18s">Codice errato. Controlla e riprova.</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px">
+      <button class="btn btn-ghost" id="secCancel">Annulla</button>
+      <button class="btn btn-danger" id="secConfirm" style="border-color:rgba(224,92,114,.4)">Conferma eliminazione</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   STATE & DATABASE
+══════════════════════════════════════════ */
+const ADMIN_PWD = 'admin2026';
+let adminAuthed = false;
+let currentView = 'dashboard';
+let currentAdminTab = 'orders';
+let rankPeriod = 'month';
+let rankMonth = 'Apr 2026';
+let histMonth = 'Apr 2026';
+let adminOrdersFilter = 'all';
+let adminOrdersPage = 1;
+let adminOrdersSort = { key: 'date', dir: -1 };
+const ROWS = 12;
+
+const CHARTS = {};
+
+// ── USERS ──
+const USERS = [
+  { id: 'u1', name: 'Marco Rossi',      role: 'Senior Tech',  color: '#3ecfcf', obj: 18 },
+  { id: 'u2', name: 'Giulia Ferrari',   role: 'Tecnico',      color: '#9b7fe8', obj: 14 },
+  { id: 'u3', name: 'Andrea Conti',     role: 'Junior Tech',  color: '#50c878', obj: 10 },
+  { id: 'u4', name: 'Sara Bianchi',     role: 'Senior Tech',  color: '#f0a030', obj: 18 },
+  { id: 'u5', name: 'Luca Marini',      role: 'Tecnico',      color: '#e05c72', obj: 14 },
+  { id: 'u6', name: 'Elena Romano',     role: 'Junior Tech',  color: '#5b8dee', obj: 10 },
+  { id: 'u7', name: 'Davide Costa',     role: 'Senior Tech',  color: '#f5c842', obj: 18 },
+  { id: 'u8', name: 'Martina Gallo',    role: 'Tecnico',      color: '#d4865a', obj: 14 },
+];
+
+const ROLES = ['Senior Tech', 'Tecnico', 'Junior Tech'];
+const ROLE_COLORS = { 'Senior Tech': '#3ecfcf', 'Tecnico': '#9b7fe8', 'Junior Tech': '#50c878' };
+
+// ── CONFIG ──
+let CFG = {
+  monthlyGoal: 100,
+  yearlyGoal: 1100,
+  year: 2026,
+  currentMonth: 'Apr 2026',
+  months: ['Gen 2026','Feb 2026','Mar 2026','Apr 2026'],
+};
+
+// ── ORDERS (PC completati) ──
+let ORDERS = [];
+let _oid = 1000;
+
+function mkDate(monthStr, day) {
+  const [m, y] = monthStr.split(' ');
+  const mi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'].indexOf(m);
+  const d = new Date(parseInt(y), mi, day);
+  return d.toISOString().split('T')[0];
+}
+
+// Seed demo data
+const SEED = [
+  // Gen 2026
+  ['u1','Desktop','Dell','OptiPlex 7090','SN-2026-0001','Gen 2026',3,''],
+  ['u1','Laptop','Lenovo','ThinkPad X1 Carbon','SN-2026-0002','Gen 2026',5,''],
+  ['u1','Workstation','HP','Z4 G4','SN-2026-0003','Gen 2026',8,''],
+  ['u2','Desktop','HP','EliteDesk 800','SN-2026-0004','Gen 2026',4,''],
+  ['u2','Laptop','Dell','Latitude 5520','SN-2026-0005','Gen 2026',9,''],
+  ['u3','Desktop','ASUS','ProArt PA90','SN-2026-0006','Gen 2026',7,''],
+  ['u4','Laptop','Apple','MacBook Pro 14','SN-2026-0007','Gen 2026',6,''],
+  ['u4','Desktop','Dell','Precision 3660','SN-2026-0008','Gen 2026',10,''],
+  ['u5','All-in-One','HP','EliteOne 800','SN-2026-0009','Gen 2026',12,''],
+  ['u6','Mini PC','Intel','NUC 13 Pro','SN-2026-0010','Gen 2026',15,''],
+  ['u7','Server','Dell','PowerEdge R350','SN-2026-0011','Gen 2026',11,''],
+  ['u7','Workstation','HP','Z2 G9','SN-2026-0012','Gen 2026',14,''],
+  ['u8','Desktop','Lenovo','ThinkCentre M90','SN-2026-0013','Gen 2026',18,''],
+  ['u1','Laptop','MSI','Creator Z16','SN-2026-0014','Gen 2026',20,''],
+  ['u2','Desktop','Acer','Aspire TC-1760','SN-2026-0015','Gen 2026',22,''],
+  // Feb 2026
+  ['u1','Desktop','Dell','OptiPlex 5090','SN-2026-0016','Feb 2026',2,''],
+  ['u1','Laptop','Lenovo','IdeaPad 5 Pro','SN-2026-0017','Feb 2026',5,''],
+  ['u2','Workstation','HP','Z8 G4','SN-2026-0018','Feb 2026',4,''],
+  ['u3','Desktop','Dell','Vostro 3910','SN-2026-0019','Feb 2026',8,''],
+  ['u4','Laptop','Apple','MacBook Air M2','SN-2026-0020','Feb 2026',6,''],
+  ['u4','Desktop','HP','ProDesk 400','SN-2026-0021','Feb 2026',10,''],
+  ['u5','All-in-One','Lenovo','IdeaCentre A340','SN-2026-0022','Feb 2026',12,''],
+  ['u6','Mini PC','ASUS','PN53','SN-2026-0023','Feb 2026',15,''],
+  ['u7','Server','HP','ProLiant DL20','SN-2026-0024','Feb 2026',11,''],
+  ['u7','Workstation','Dell','Precision 5760','SN-2026-0025','Feb 2026',16,''],
+  ['u8','Desktop','Acer','Veriton X4690G','SN-2026-0026','Feb 2026',18,''],
+  ['u1','Laptop','HP','EliteBook 840 G9','SN-2026-0027','Feb 2026',20,''],
+  ['u2','Desktop','Lenovo','ThinkStation P620','SN-2026-0028','Feb 2026',22,''],
+  ['u3','Laptop','Dell','XPS 15','SN-2026-0029','Feb 2026',24,''],
+  // Mar 2026
+  ['u1','Desktop','Dell','Precision 3660','SN-2026-0030','Mar 2026',1,''],
+  ['u1','Laptop','Lenovo','ThinkPad T14s','SN-2026-0031','Mar 2026',4,''],
+  ['u1','Workstation','HP','Z4 G5','SN-2026-0032','Mar 2026',7,''],
+  ['u2','Desktop','HP','EliteDesk 805','SN-2026-0033','Mar 2026',3,''],
+  ['u2','Laptop','Apple','MacBook Pro 16','SN-2026-0034','Mar 2026',8,''],
+  ['u3','Desktop','ASUS','Pro B550','SN-2026-0035','Mar 2026',5,''],
+  ['u3','Laptop','Acer','ConceptD 7','SN-2026-0036','Mar 2026',12,''],
+  ['u4','Desktop','Dell','OptiPlex 7090','SN-2026-0037','Mar 2026',9,''],
+  ['u4','Laptop','Lenovo','X1 Extreme G5','SN-2026-0038','Mar 2026',14,''],
+  ['u5','All-in-One','Apple','iMac 24','SN-2026-0039','Mar 2026',11,''],
+  ['u6','Mini PC','Lenovo','ThinkCentre M90n','SN-2026-0040','Mar 2026',16,''],
+  ['u7','Server','Dell','PowerEdge R450','SN-2026-0041','Mar 2026',10,''],
+  ['u7','Workstation','HP','Z2 G9 SFF','SN-2026-0042','Mar 2026',18,''],
+  ['u8','Desktop','HP','EliteDesk 600','SN-2026-0043','Mar 2026',20,''],
+  ['u8','Laptop','Dell','Latitude 7420','SN-2026-0044','Mar 2026',25,''],
+  // Apr 2026
+  ['u1','Desktop','Dell','OptiPlex 7090','SN-2026-0045','Apr 2026',1,''],
+  ['u1','Laptop','Lenovo','ThinkPad X1 Carbon','SN-2026-0046','Apr 2026',3,''],
+  ['u1','Workstation','HP','Z4 G4','SN-2026-0047','Apr 2026',6,''],
+  ['u2','Desktop','HP','ProDesk 600','SN-2026-0048','Apr 2026',2,''],
+  ['u2','Laptop','Apple','MacBook Pro 14','SN-2026-0049','Apr 2026',8,''],
+  ['u3','Desktop','ASUS','ProArt','SN-2026-0050','Apr 2026',5,''],
+  ['u4','Desktop','Dell','Precision 3660','SN-2026-0051','Apr 2026',7,''],
+  ['u4','Laptop','HP','EliteBook 850','SN-2026-0052','Apr 2026',10,''],
+  ['u5','All-in-One','Lenovo','IdeaCentre AIO','SN-2026-0053','Apr 2026',4,''],
+  ['u6','Mini PC','Intel','NUC 12 Pro','SN-2026-0054','Apr 2026',9,''],
+  ['u7','Workstation','Dell','Precision 5860','SN-2026-0055','Apr 2026',11,''],
+  ['u8','Desktop','Acer','Veriton M','SN-2026-0056','Apr 2026',14,''],
+  ['u1','Server','HP','ProLiant ML30','SN-2026-0057','Apr 2026',15,''],
+  ['u7','Laptop','MSI','WS76','SN-2026-0058','Apr 2026',17,''],
+  ['u5','Desktop','Dell','Vostro 5090','SN-2026-0059','Apr 2026',13,''],
+  ['u6','Laptop','Lenovo','IdeaPad Pro 5','SN-2026-0060','Apr 2026',18,''],
+];
+
+SEED.forEach(([uid, tipo, brand, model, serial, month, day, note]) => {
+  ORDERS.push({
+    id: 'PC-' + String(++_oid),
+    userId: uid,
+    tipo, brand, model, serial,
+    date: mkDate(month, day),
+    month,
+    note,
+    status: 'done',
+  });
+});
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function userById(id) { return USERS.find(u => u.id === id) || null; }
+function ordersInMonth(m) { return ORDERS.filter(o => o.month === m); }
+function ordersInYear(y) { return ORDERS.filter(o => o.month.endsWith(String(y))); }
+function pcByUser(uid, month) { return ORDERS.filter(o => o.userId === uid && o.month === month).length; }
+function pcByUserYear(uid, year) { return ORDERS.filter(o => o.userId === uid && o.month.endsWith(String(year))).length; }
+
+function monthToNum(m) {
+  const [mo, yr] = m.split(' ');
+  const idx = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'].indexOf(mo);
+  return parseInt(yr) * 100 + idx;
+}
+
+function prevMonth(m) {
+  const idx = CFG.months.indexOf(m);
+  return idx > 0 ? CFG.months[idx - 1] : null;
+}
+
+function toast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.className = 't-' + type;
+  t.textContent = type === 'ok' ? '✓ ' + msg : type === 'err' ? '✕ ' + msg : 'ℹ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function avatarInitials(name) {
+  return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function countAnim(el, target, prefix = '', suffix = '', dec = 0) {
+  let val = 0;
+  const step = Math.max(1, target / 35);
+  const t = setInterval(() => {
+    val = Math.min(val + step, target);
+    el.textContent = prefix + (dec ? val.toFixed(dec) : Math.round(val).toLocaleString('it-IT')) + suffix;
+    if (val >= target) clearInterval(t);
+  }, 20);
+}
+
+function mkChart(id, cfg) {
+  if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; }
+  const el = document.getElementById(id);
+  if (!el) return;
+  CHARTS[id] = new Chart(el, cfg);
+}
+
+const CHART_DEFAULTS = {
+  color: '#7e8499',
+  borderColor: 'rgba(255,255,255,0.06)',
+};
+Chart.defaults.color = CHART_DEFAULTS.color;
+Chart.defaults.borderColor = CHART_DEFAULTS.borderColor;
+Chart.defaults.font.family = "'Mulish', sans-serif";
+
+const TOOLTIP_STYLE = {
+  backgroundColor: '#1c2030',
+  titleColor: '#eceae4',
+  bodyColor: '#7e8499',
+  borderColor: 'rgba(255,255,255,0.1)',
+  borderWidth: 1,
+  padding: 10,
+  cornerRadius: 8,
+};
+
+/* ══════════════════════════════════════════
+   DASHBOARD RENDER
+══════════════════════════════════════════ */
+function renderDashboard() {
+  const cm = CFG.currentMonth;
+  const pm = prevMonth(cm);
+  const allMonth = ordersInMonth(cm);
+  const allYear = ordersInYear(CFG.year);
+  const monthCount = allMonth.length;
+  const yearCount = allYear.length;
+  const activeTeam = USERS.filter(u => pcByUser(u.id, cm) > 0).length;
+  const prevCount = pm ? ordersInMonth(pm).length : 0;
+  const pct = Math.round(monthCount / CFG.monthlyGoal * 100);
+
+  // KPI 1 - mese
+  const k1 = document.getElementById('kMese');
+  countAnim(k1, monthCount);
+  const d1 = prevCount > 0 ? Math.round((monthCount - prevCount) / prevCount * 100) : 0;
+  const kMD = document.getElementById('kMeseDelta');
+  kMD.textContent = (d1 >= 0 ? '↑ ' : '↓ ') + Math.abs(d1) + '% vs mese prec.';
+  kMD.className = 'kpi-delta ' + (d1 >= 0 ? 'up' : 'dn');
+  document.getElementById('kMeseSub').textContent = 'Obiettivo: ' + CFG.monthlyGoal;
+  setTimeout(() => { document.getElementById('kMeseProg').style.width = Math.min(100, pct) + '%'; }, 100);
+
+  // KPI 2 - anno
+  countAnim(document.getElementById('kAnno'), yearCount);
+  const ypct = Math.round(yearCount / CFG.yearlyGoal * 100);
+  document.getElementById('kAnnoSub').textContent = 'Obiettivo annuale: ' + CFG.yearlyGoal;
+  setTimeout(() => { document.getElementById('kAnnoProg').style.width = Math.min(100, ypct) + '%'; }, 150);
+
+  // KPI 3 - team
+  const k3 = document.getElementById('kTeam');
+  countAnim(k3, activeTeam);
+  document.getElementById('kTeamDelta').textContent = activeTeam + ' / ' + USERS.length + ' persone';
+  document.getElementById('kTeamDelta').className = 'kpi-delta b-cyan';
+
+  // KPI 4 - obiettivo
+  countAnim(document.getElementById('kObj'), pct, '', '%');
+  const kOD = document.getElementById('kObjDelta');
+  kOD.textContent = monthCount + ' / ' + CFG.monthlyGoal + ' PC';
+  kOD.className = 'kpi-delta ' + (pct >= 100 ? 'up' : pct >= 70 ? 'kpi-delta' : 'dn');
+  document.getElementById('kObjSub').textContent = pct >= 100 ? '🎉 Obiettivo raggiunto!' : (CFG.monthlyGoal - monthCount) + ' rimanenti';
+  setTimeout(() => { document.getElementById('kObjProg').style.width = Math.min(100, pct) + '%'; }, 200);
+
+  // Charts
+  renderMonthlyChart();
+  renderRoleChart();
+  renderTopPerformer();
+  renderWeeklyChart();
+}
+
+function renderMonthlyChart() {
+  const labels = CFG.months;
+  const data = labels.map(m => ordersInMonth(m).length);
+  const goals = labels.map(() => CFG.monthlyGoal);
+  mkChart('cMonthly', {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'PC completati', data, backgroundColor: 'rgba(62,207,207,0.7)', borderColor: '#3ecfcf', borderWidth: 1, borderRadius: 5, borderSkipped: false },
+        { label: 'Obiettivo', data: goals, type: 'line', borderColor: 'rgba(255,255,255,0.18)', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 4], fill: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP_STYLE } },
+      scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+        x: { grid: { display: false }, ticks: { autoSkip: false } }
+      }
+    }
+  });
+}
+
+function renderRoleChart() {
+  const cm = CFG.currentMonth;
+  const byRole = {};
+  ROLES.forEach(r => { byRole[r] = 0; });
+  ordersInMonth(cm).forEach(o => {
+    const u = userById(o.userId);
+    if (u) byRole[u.role] = (byRole[u.role] || 0) + 1;
+  });
+  const legend = document.getElementById('roleLegend');
+  legend.innerHTML = ROLES.map(r => `<span><span class="ldot" style="background:${ROLE_COLORS[r]}"></span>${r}: ${byRole[r]}</span>`).join('');
+  mkChart('cRole', {
+    type: 'doughnut',
+    data: {
+      labels: ROLES,
+      datasets: [{ data: ROLES.map(r => byRole[r] || 0), backgroundColor: ROLES.map(r => ROLE_COLORS[r]), borderWidth: 0, hoverOffset: 8 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '66%',
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP_STYLE } }
+    }
+  });
+}
+
+function renderTopPerformer() {
+  const cm = CFG.currentMonth;
+  const ranked = [...USERS].map(u => ({ ...u, count: pcByUser(u.id, cm) })).sort((a, b) => b.count - a.count);
+  document.getElementById('dashTopSub').textContent = cm + ' — classifica attuale';
+  const el = document.getElementById('dashTop');
+  el.innerHTML = ranked.slice(0, 5).map((u, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i < 4 ? 'border-bottom:1px solid var(--border);' : ''}">
+      <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:${i===0?'var(--gold)':i===1?'var(--silver)':i===2?'var(--bronze)':'var(--text3)'};width:22px;text-align:center">${i+1}</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#07080a;flex-shrink:0">${avatarInitials(u.name)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${u.name}</div>
+        <div style="font-size:10.5px;color:var(--text3)">${u.role}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">${u.count}</div>
+        <div style="font-size:10px;color:var(--text3)">${Math.round(u.count/u.obj*100)}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderWeeklyChart() {
+  const cm = CFG.currentMonth;
+  const [mo, yr] = cm.split(' ');
+  const mi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'].indexOf(mo);
+  const wLabels = ['Sett 1', 'Sett 2', 'Sett 3', 'Sett 4'];
+  const wData = [0, 0, 0, 0];
+  ordersInMonth(cm).forEach(o => {
+    const d = new Date(o.date);
+    const day = d.getDate();
+    const wi = Math.min(3, Math.floor((day - 1) / 7));
+    wData[wi]++;
+  });
+  mkChart('cWeekly', {
+    type: 'line',
+    data: {
+      labels: wLabels,
+      datasets: [{
+        data: wData, borderColor: '#9b7fe8', backgroundColor: 'rgba(155,127,232,0.1)',
+        fill: true, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#9b7fe8',
+        pointBorderColor: '#07080a', pointBorderWidth: 2, borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP_STYLE } },
+      scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   INSERT FORM
+══════════════════════════════════════════ */
+function populateInsertForm() {
+  const sel = document.getElementById('insUser');
+  sel.innerHTML = '<option value="">— Seleziona il tuo nome —</option>' +
+    USERS.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
+  // Default date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('insDate').value = today;
+}
+
+document.getElementById('insSubmit').addEventListener('click', () => {
+  const uid = document.getElementById('insUser').value;
+  const tipo = document.getElementById('insTipo').value;
+  const brand = document.getElementById('insBrand').value;
+  const model = document.getElementById('insModel').value.trim();
+  const serial = document.getElementById('insSerial').value.trim();
+  const date = document.getElementById('insDate').value;
+  const note = document.getElementById('insNote').value.trim();
+
+  if (!uid) return toast('Seleziona il tuo nome', 'err');
+  if (!tipo) return toast('Seleziona il tipo PC', 'err');
+  if (!brand) return toast('Seleziona il brand', 'err');
+  if (!model) return toast('Inserisci il modello', 'err');
+  if (!serial) return toast('Inserisci il numero seriale', 'err');
+  if (!date) return toast('Inserisci la data', 'err');
+
+  // Determine month from date
+  const d = new Date(date);
+  const mi = d.getMonth();
+  const yr = d.getFullYear();
+  const mNames = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const monthStr = mNames[mi] + ' ' + yr;
+
+  // Add month to CFG if not present
+  if (!CFG.months.includes(monthStr)) {
+    CFG.months.push(monthStr);
+    CFG.months.sort((a, b) => monthToNum(a) - monthToNum(b));
+    CFG.currentMonth = CFG.months[CFG.months.length - 1];
+  }
+
+  const o = {
+    id: 'PC-' + String(++_oid),
+    userId: uid,
+    tipo, brand, model, serial,
+    date, month: monthStr, note,
+    status: 'done',
+  };
+  ORDERS.push(o);
+
+  const u = userById(uid);
+  toast(`PC registrato per ${u.name}!`, 'ok');
+  document.getElementById('insReset').click();
+  updateAll();
+});
+
+document.getElementById('insReset').addEventListener('click', () => {
+  document.getElementById('insUser').value = '';
+  document.getElementById('insTipo').value = '';
+  document.getElementById('insBrand').value = '';
+  document.getElementById('insModel').value = '';
+  document.getElementById('insSerial').value = '';
+  document.getElementById('insDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('insNote').value = '';
+});
+
+/* ══════════════════════════════════════════
+   RANK VIEW
+══════════════════════════════════════════ */
+function renderRank() {
+  renderRankMonthSelector();
+  renderPodium();
+  renderRankTable();
+}
+
+function renderRankMonthSelector() {
+  const el = document.getElementById('rankMonthSelector');
+  if (rankPeriod === 'year') { el.innerHTML = ''; return; }
+  el.innerHTML = CFG.months.map(m =>
+    `<div class="mchip ${m === rankMonth ? 'on' : ''}" data-rm="${m}">${m}</div>`
+  ).join('');
+  el.querySelectorAll('.mchip').forEach(c => {
+    c.addEventListener('click', () => { rankMonth = c.dataset.rm; renderRank(); });
+  });
+}
+
+function getRankData() {
+  if (rankPeriod === 'month') {
+    return USERS.map(u => ({
+      ...u,
+      count: pcByUser(u.id, rankMonth),
+      goal: u.obj,
+    })).sort((a, b) => b.count - a.count);
+  } else {
+    return USERS.map(u => ({
+      ...u,
+      count: pcByUserYear(u.id, CFG.year),
+      goal: u.obj * CFG.months.length,
+    })).sort((a, b) => b.count - a.count);
+  }
+}
+
+function renderPodium() {
+  const data = getRankData();
+  const top3 = [data[1], data[0], data[2]].filter(Boolean); // silver, gold, bronze order
+  const classes = ['p2', 'p1', 'p3'];
+  const crowns = ['🥈', '🏆', '🥉'];
+  const valColors = ['silver', 'gold', 'bronze'];
+  const podEl = document.getElementById('podium');
+  podEl.innerHTML = top3.map((u, i) => {
+    const pos = top3.indexOf(u);
+    const realPos = data.indexOf(u);
+    return `
+    <div class="pod-item ${classes[i]}">
+      <div class="pod-crown">${crowns[i]}</div>
+      <div class="pod-ava" style="background:${u.color}">${avatarInitials(u.name)}</div>
+      <div class="pod-name">${u.name}</div>
+      <div class="pod-role">${u.role}</div>
+      <div class="pod-val ${valColors[i]}">${u.count}</div>
+      <div style="font-size:10.5px;color:var(--text3);margin-top:2px">PC completati</div>
+      <div class="prog-wrap"><div class="prog-fill" style="background:${u.color};width:${Math.min(100,Math.round(u.count/u.goal*100))}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderRankTable() {
+  const data = getRankData();
+  const tbody = document.getElementById('rankBody');
+  tbody.innerHTML = data.map((u, i) => {
+    const pct = Math.round(u.count / u.goal * 100);
+    const prevM = prevMonth(rankMonth);
+    const trend = rankPeriod === 'month' && prevM
+      ? pcByUser(u.id, rankMonth) - pcByUser(u.id, prevM) : 0;
+    return `
+    <tr>
+      <td><span class="rank-num ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:28px;height:28px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#07080a">${avatarInitials(u.name)}</div>
+          <span class="cname">${u.name}</span>
+        </div>
+      </td>
+      <td><span class="badge b-cyan">${u.role}</span></td>
+      <td><span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--cyan)">${u.count}</span></td>
+      <td><span style="color:var(--text3)">${u.goal}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;max-width:80px">
+            <div class="prog-wrap"><div class="prog-fill" style="background:${pct>=100?'var(--green)':pct>=70?'var(--cyan)':'var(--amber)'};width:${Math.min(100,pct)}%"></div></div>
+          </div>
+          <span style="font-size:12px;font-weight:600;color:${pct>=100?'var(--green)':pct>=70?'var(--cyan)':'var(--amber)'}">${pct}%</span>
+        </div>
+      </td>
+      <td><span style="font-size:12px;font-weight:600;color:${trend>0?'var(--green)':trend<0?'var(--red)':'var(--text3)'}">
+        ${trend>0?'↑ '+trend:trend<0?'↓ '+Math.abs(trend):'—'}
+      </span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   HISTORY VIEW
+══════════════════════════════════════════ */
+function renderHistory() {
+  // Month selector
+  const sel = document.getElementById('histMonthSel');
+  sel.innerHTML = CFG.months.map(m =>
+    `<div class="mchip ${m === histMonth ? 'on' : ''}" data-hm="${m}">${m}</div>`
+  ).join('');
+  sel.querySelectorAll('.mchip').forEach(c => {
+    c.addEventListener('click', () => { histMonth = c.dataset.hm; renderHistory(); });
+  });
+  renderHistContent();
+}
+
+function renderHistContent() {
+  const m = histMonth;
+  const orders = ordersInMonth(m);
+  const cont = document.getElementById('histContent');
+
+  const ranked = [...USERS].map(u => ({
+    ...u,
+    count: pcByUser(u.id, m),
+    goal: u.obj,
+  })).sort((a, b) => b.count - a.count);
+
+  const totalPc = orders.length;
+  const goalPct = Math.round(totalPc / CFG.monthlyGoal * 100);
+
+  cont.innerHTML = `
+  <div class="kpi-grid" style="margin-bottom:18px">
+    <div class="kpi" style="--kc:var(--cyan)">
+      <div class="kpi-lbl">PC completati</div>
+      <div class="kpi-val">${totalPc}</div>
+      <div class="kpi-sub">Obiettivo: ${CFG.monthlyGoal}</div>
+      <div class="prog-wrap"><div class="prog-fill" style="background:var(--cyan);width:${Math.min(100,goalPct)}%"></div></div>
+    </div>
+    <div class="kpi" style="--kc:var(--purple)">
+      <div class="kpi-lbl">Team attivo</div>
+      <div class="kpi-val">${USERS.filter(u => pcByUser(u.id, m) > 0).length}</div>
+      <div class="kpi-sub">su ${USERS.length} persone</div>
+    </div>
+    <div class="kpi" style="--kc:var(--green)">
+      <div class="kpi-lbl">Obiettivo %</div>
+      <div class="kpi-val">${goalPct}%</div>
+      <span class="kpi-delta ${goalPct>=100?'up':goalPct>=70?'':'dn'}">${goalPct>=100?'✓ Raggiunto':goalPct>=70?'In corso':'Sotto obiettivo'}</span>
+    </div>
+    <div class="kpi" style="--kc:var(--amber)">
+      <div class="kpi-lbl">Top performer</div>
+      <div class="kpi-val">${ranked[0]?.count || 0}</div>
+      <div class="kpi-sub">${ranked[0]?.name || '—'}</div>
+    </div>
+  </div>
+
+  <div class="charts-row cc2" style="margin-bottom:18px">
+    <div class="chart-card">
+      <div class="cc-head"><div><div class="cc-title">Riepilogo per persona</div><div class="cc-sub">${m}</div></div></div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="histPersonChart" role="img" aria-label="PC per persona">PC per persona.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="cc-head"><div><div class="cc-title">% Obiettivo individuale</div><div class="cc-sub">${m}</div></div></div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="histObjChart" role="img" aria-label="Obiettivo per persona">Obiettivo per persona.</canvas></div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Nome</th><th>Ruolo</th><th>PC completati</th><th>Obiettivo</th><th>% Raggiunto</th>
+      </tr></thead>
+      <tbody>
+        ${ranked.map((u,i)=>`
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:9px">
+              <div style="width:26px;height:26px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#07080a">${avatarInitials(u.name)}</div>
+              <span class="cname">${u.name}</span>
+            </div>
+          </td>
+          <td><span class="badge b-cyan">${u.role}</span></td>
+          <td><span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--cyan)">${u.count}</span></td>
+          <td><span style="color:var(--text3)">${u.goal}</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;max-width:100px"><div class="prog-wrap"><div class="prog-fill" style="background:${u.count>=u.goal?'var(--green)':'var(--cyan)'};width:${Math.min(100,Math.round(u.count/u.goal*100))}%"></div></div></div>
+              <span style="font-size:12px;font-weight:600;color:${u.count>=u.goal?'var(--green)':'var(--cyan)'}">${Math.round(u.count/u.goal*100)}%</span>
+            </div>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  // Charts
+  setTimeout(() => {
+    mkChart('histPersonChart', {
+      type: 'bar',
+      data: {
+        labels: ranked.map(u => u.name.split(' ')[0]),
+        datasets: [{
+          data: ranked.map(u => u.count),
+          backgroundColor: ranked.map(u => u.color + 'cc'),
+          borderColor: ranked.map(u => u.color),
+          borderWidth: 1, borderRadius: 5, borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { ...TOOLTIP_STYLE } },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+          x: { grid: { display: false }, ticks: { autoSkip: false } }
+        }
+      }
+    });
+    mkChart('histObjChart', {
+      type: 'bar',
+      data: {
+        labels: ranked.map(u => u.name.split(' ')[0]),
+        datasets: [{
+          data: ranked.map(u => Math.min(100, Math.round(u.count / u.goal * 100))),
+          backgroundColor: ranked.map(u => u.count >= u.goal ? 'rgba(80,200,120,0.7)' : 'rgba(62,207,207,0.6)'),
+          borderColor: ranked.map(u => u.count >= u.goal ? '#50c878' : '#3ecfcf'),
+          borderWidth: 1, borderRadius: 5, borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { ...TOOLTIP_STYLE, callbacks: { label: ctx => ctx.raw + '%' } } },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, max: 100, ticks: { callback: v => v + '%' } },
+          x: { grid: { display: false }, ticks: { autoSkip: false } }
+        }
+      }
+    });
+  }, 50);
+}
+
+/* ══════════════════════════════════════════
+   ADMIN — ORDERS TAB
+══════════════════════════════════════════ */
+function renderAdminOrders() {
+  let data = [...ORDERS];
+  // Filter
+  if (adminOrdersFilter !== 'all') {
+    data = data.filter(o => {
+      const u = userById(o.userId);
+      return adminOrdersFilter === 'month'
+        ? o.month === CFG.currentMonth
+        : u && u.id === adminOrdersFilter;
+    });
+  }
+  // Sort
+  data.sort((a, b) => {
+    let av = a[adminOrdersSort.key], bv = b[adminOrdersSort.key];
+    if (av < bv) return -adminOrdersSort.dir;
+    if (av > bv) return adminOrdersSort.dir;
+    return 0;
+  });
+  const total = data.length;
+  const totalPages = Math.max(1, Math.ceil(total / ROWS));
+  if (adminOrdersPage > totalPages) adminOrdersPage = 1;
+  const slice = data.slice((adminOrdersPage - 1) * ROWS, adminOrdersPage * ROWS);
+
+  const cont = document.getElementById('atab-orders');
+  cont.innerHTML = `
+  <div class="sh" style="margin-bottom:14px">
+    <div class="sh-title">Tutti i PC</div>
+    <div class="fbar">
+      <select class="srch" id="aof" style="width:auto">
+        <option value="all">Tutti i mesi / utenti</option>
+        <option value="month">Solo mese corrente (${CFG.currentMonth})</option>
+        ${USERS.map(u => `<option value="${u.id}" ${adminOrdersFilter===u.id?'selected':''}>${u.name}</option>`).join('')}
+      </select>
+      <button class="btn btn-primary btn-sm" id="aAddBtn">+ Aggiungi PC</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th data-as="id">ID</th>
+        <th data-as="userId">Tecnico</th>
+        <th data-as="tipo">Tipo</th>
+        <th data-as="brand">Brand</th>
+        <th data-as="model">Modello</th>
+        <th data-as="serial">Seriale</th>
+        <th data-as="date">Data</th>
+        <th data-as="month">Mese</th>
+        <th>Azioni</th>
+      </tr></thead>
+      <tbody>
+        ${slice.map(o => {
+          const u = userById(o.userId);
+          return `<tr>
+            <td><span class="mono" style="color:var(--cyan)">${o.id}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:24px;height:24px;border-radius:50%;background:${u?.color||'#888'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#07080a">${avatarInitials(u?.name||'?')}</div>
+                <span class="cname">${u?.name||'N/A'}</span>
+              </div>
+            </td>
+            <td><span class="badge b-cyan">${o.tipo}</span></td>
+            <td style="color:var(--text)">${o.brand}</td>
+            <td style="color:var(--text)">${o.model}</td>
+            <td><span class="mono" style="font-size:11px">${o.serial}</span></td>
+            <td><span class="mono" style="font-size:11.5px">${o.date}</span></td>
+            <td><span class="period-badge">${o.month}</span></td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <div class="act-btn edt" data-oid="${o.id}" title="Modifica">✎</div>
+                <div class="act-btn del" data-oid="${o.id}" title="Elimina">✕</div>
+              </div>
+            </td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3)">Nessun PC trovato</td></tr>`}
+      </tbody>
+    </table>
+    <div class="pag">
+      <span>Mostrando ${total===0?0:(adminOrdersPage-1)*ROWS+1}–${Math.min(adminOrdersPage*ROWS,total)} di ${total}</span>
+      <div class="pag-btns" id="aPagBtns"></div>
+    </div>
+  </div>`;
+
+  // Pagination
+  const pb = cont.querySelector('#aPagBtns');
+  const mkPb = (label, page, disabled = false, cur = false) => {
+    const b = document.createElement('button');
+    b.className = 'pb' + (cur ? ' cur' : '');
+    b.textContent = label;
+    b.disabled = disabled;
+    b.onclick = () => { adminOrdersPage = page; renderAdminOrders(); };
+    pb.appendChild(b);
+  };
+  mkPb('‹', adminOrdersPage - 1, adminOrdersPage === 1);
+  for (let i = 1; i <= totalPages; i++) mkPb(i, i, false, i === adminOrdersPage);
+  mkPb('›', adminOrdersPage + 1, adminOrdersPage >= totalPages);
+
+  // Events
+  cont.querySelector('#aof').addEventListener('change', e => {
+    adminOrdersFilter = e.target.value;
+    adminOrdersPage = 1;
+    renderAdminOrders();
+  });
+  cont.querySelectorAll('th[data-as]').forEach(th => {
+    th.addEventListener('click', () => {
+      if (adminOrdersSort.key === th.dataset.as) adminOrdersSort.dir *= -1;
+      else { adminOrdersSort.key = th.dataset.as; adminOrdersSort.dir = 1; }
+      renderAdminOrders();
+    });
+  });
+  cont.querySelectorAll('.act-btn.edt').forEach(btn => {
+    btn.addEventListener('click', () => openEditOrderModal(btn.dataset.oid));
+  });
+  cont.querySelectorAll('.act-btn.del').forEach(btn => {
+    btn.addEventListener('click', () => deleteOrder(btn.dataset.oid));
+  });
+  cont.querySelector('#aAddBtn').addEventListener('click', openAddOrderModal);
+}
+
+function deleteOrder(id) {
+  if (!confirm('Eliminare il PC ' + id + '?')) return;
+  ORDERS = ORDERS.filter(o => o.id !== id);
+  toast('PC eliminato', 'info');
+  updateAll();
+  renderAdminTab('orders');
+}
+
+function openAddOrderModal() {
+  document.getElementById('modalTitle').textContent = '+ Aggiungi PC';
+  document.getElementById('modalBody').innerHTML = buildOrderForm(null);
+  document.getElementById('modalOk').onclick = () => {
+    const vals = getOrderFormVals();
+    if (!vals) return;
+    const o = { id: 'PC-' + String(++_oid), ...vals, status: 'done' };
+    ORDERS.push(o);
+    closeModal();
+    toast('PC aggiunto', 'ok');
+    updateAll();
+    renderAdminTab('orders');
+  };
+  openModal();
+}
+
+function openEditOrderModal(id) {
+  const o = ORDERS.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('modalTitle').textContent = 'Modifica ' + id;
+  document.getElementById('modalBody').innerHTML = buildOrderForm(o);
+  document.getElementById('modalOk').onclick = () => {
+    const vals = getOrderFormVals();
+    if (!vals) return;
+    Object.assign(o, vals);
+    closeModal();
+    toast('PC aggiornato', 'ok');
+    updateAll();
+    renderAdminTab('orders');
+  };
+  openModal();
+}
+
+function buildOrderForm(o) {
+  const userOpts = USERS.map(u => `<option value="${u.id}" ${o&&o.userId===u.id?'selected':''}>${u.name}</option>`).join('');
+  const tipos = ['Desktop','Laptop','Workstation','Server','All-in-One','Mini PC'];
+  const brands = ['Dell','HP','Lenovo','Apple','ASUS','Acer','MSI','Samsung','Custom','Altro'];
+  return `
+  <div class="form-row r2">
+    <div class="form-group"><label class="form-label">Tecnico</label><select class="form-select" id="mUser"><option value="">—</option>${userOpts}</select></div>
+    <div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="mTipo">${tipos.map(t=>`<option ${o&&o.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+  </div>
+  <div class="form-row r2">
+    <div class="form-group"><label class="form-label">Brand</label><select class="form-select" id="mBrand">${brands.map(b=>`<option ${o&&o.brand===b?'selected':''}>${b}</option>`).join('')}</select></div>
+    <div class="form-group"><label class="form-label">Modello</label><input class="form-input" id="mModel" value="${o?o.model:''}" placeholder="es. ThinkPad X1" /></div>
+  </div>
+  <div class="form-row r2">
+    <div class="form-group"><label class="form-label">Seriale</label><input class="form-input" id="mSerial" value="${o?o.serial:''}" style="font-family:'JetBrains Mono',monospace" /></div>
+    <div class="form-group"><label class="form-label">Data</label><input class="form-input" id="mDate" type="date" value="${o?o.date:new Date().toISOString().split('T')[0]}" /></div>
+  </div>
+  <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="mNote" value="${o?o.note:''}" /></div>`;
+}
+
+function getOrderFormVals() {
+  const uid = document.getElementById('mUser').value;
+  const tipo = document.getElementById('mTipo').value;
+  const brand = document.getElementById('mBrand').value;
+  const model = document.getElementById('mModel').value.trim();
+  const serial = document.getElementById('mSerial').value.trim();
+  const date = document.getElementById('mDate').value;
+  const note = document.getElementById('mNote').value.trim();
+  if (!uid || !model || !serial || !date) { toast('Compila tutti i campi', 'err'); return null; }
+  const d = new Date(date);
+  const mNames = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const month = mNames[d.getMonth()] + ' ' + d.getFullYear();
+  if (!CFG.months.includes(month)) {
+    CFG.months.push(month);
+    CFG.months.sort((a, b) => monthToNum(a) - monthToNum(b));
+    CFG.currentMonth = CFG.months[CFG.months.length - 1];
+  }
+  return { userId: uid, tipo, brand, model, serial, date, month, note };
+}
+
+/* ══════════════════════════════════════════
+   ADMIN — USERS TAB
+══════════════════════════════════════════ */
+function renderAdminUsers() {
+  const cont = document.getElementById('atab-users');
+  cont.innerHTML = `
+  <div class="sh"><div class="sh-title">Gestione Utenti</div><button class="btn btn-primary btn-sm" id="aAddUser">+ Aggiungi utente</button></div>
+  <div class="tbl-wrap" style="margin-bottom:20px">
+    <table>
+      <thead><tr><th>Nome</th><th>Ruolo</th><th>Obiettivo mensile</th><th>PC mese corrente</th><th>PC anno</th><th>% Obj</th><th>Azioni</th></tr></thead>
+      <tbody>
+        ${USERS.map(u => {
+          const cm = pcByUser(u.id, CFG.currentMonth);
+          const ya = pcByUserYear(u.id, CFG.year);
+          const pct = Math.round(cm / u.obj * 100);
+          return `<tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:30px;height:30px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#07080a">${avatarInitials(u.name)}</div>
+                <span class="cname">${u.name}</span>
+              </div>
+            </td>
+            <td><span class="badge b-cyan">${u.role}</span></td>
+            <td><span class="mono" style="color:var(--amber)">${u.obj}</span></td>
+            <td><span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--cyan)">${cm}</span></td>
+            <td><span class="mono">${ya}</span></td>
+            <td><span style="font-size:12px;font-weight:600;color:${pct>=100?'var(--green)':pct>=70?'var(--cyan)':'var(--amber)'}">${pct}%</span></td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <div class="act-btn edt" data-uid="${u.id}">✎</div>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  cont.querySelectorAll('.act-btn.edt').forEach(btn => {
+    btn.addEventListener('click', () => openEditUserModal(btn.dataset.uid));
+  });
+  cont.querySelector('#aAddUser').addEventListener('click', openAddUserModal);
+}
+
+function openAddUserModal() {
+  document.getElementById('modalTitle').textContent = '+ Aggiungi utente';
+  document.getElementById('modalBody').innerHTML = buildUserForm(null);
+  document.getElementById('modalOk').onclick = () => {
+    const vals = getUserFormVals();
+    if (!vals) return;
+    const newU = { id: 'u' + (USERS.length + 1), ...vals };
+    USERS.push(newU);
+    closeModal();
+    toast('Utente aggiunto', 'ok');
+    updateAll();
+    renderAdminTab('users');
+  };
+  openModal();
+}
+
+function openEditUserModal(id) {
+  const u = USERS.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('modalTitle').textContent = 'Modifica ' + u.name;
+  document.getElementById('modalBody').innerHTML = buildUserForm(u);
+  document.getElementById('modalOk').onclick = () => {
+    const vals = getUserFormVals();
+    if (!vals) return;
+    Object.assign(u, vals);
+    closeModal();
+    toast('Utente aggiornato', 'ok');
+    updateAll();
+    renderAdminTab('users');
+  };
+  openModal();
+}
+
+function buildUserForm(u) {
+  const roleOpts = ROLES.map(r => `<option ${u&&u.role===r?'selected':''}>${r}</option>`).join('');
+  const colors = ['#3ecfcf','#9b7fe8','#50c878','#f0a030','#e05c72','#5b8dee','#f5c842','#d4865a'];
+  return `
+  <div class="form-row r2">
+    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="uName" value="${u?u.name:''}" /></div>
+    <div class="form-group"><label class="form-label">Ruolo</label><select class="form-select" id="uRole">${roleOpts}</select></div>
+  </div>
+  <div class="form-row r2">
+    <div class="form-group"><label class="form-label">Obiettivo mensile</label><input class="form-input" id="uObj" type="number" min="1" value="${u?u.obj:10}" /></div>
+    <div class="form-group"><label class="form-label">Colore avatar</label><select class="form-select" id="uColor">${colors.map(c=>`<option value="${c}" ${u&&u.color===c?'selected':''}>${c}</option>`).join('')}</select></div>
+  </div>`;
+}
+
+function getUserFormVals() {
+  const name = document.getElementById('uName').value.trim();
+  const role = document.getElementById('uRole').value;
+  const obj = parseInt(document.getElementById('uObj').value);
+  const color = document.getElementById('uColor').value;
+  if (!name) { toast('Inserisci il nome', 'err'); return null; }
+  if (!obj || obj < 1) { toast('Obiettivo non valido', 'err'); return null; }
+  return { name, role, obj, color };
+}
+
+/* ══════════════════════════════════════════
+   ADMIN — GOALS TAB
+══════════════════════════════════════════ */
+function renderAdminGoals() {
+  const cont = document.getElementById('atab-goals');
+  cont.innerHTML = `
+  <div class="sh"><div class="sh-title">Obiettivi</div></div>
+  <div class="cfg-grid" style="margin-bottom:20px">
+    <div class="cfg-card">
+      <div class="cfg-title">Obiettivi globali</div>
+      <div class="card-row">
+        <span class="cr-label">Obiettivo mensile (PC totali team)</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="ie-inp" id="gMonthly" type="number" value="${CFG.monthlyGoal}" min="1" />
+          <button class="btn btn-primary btn-sm" id="saveMonthly">✓</button>
+        </div>
+      </div>
+      <div class="card-row">
+        <span class="cr-label">Obiettivo annuale (PC totali team)</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="ie-inp" id="gYearly" type="number" value="${CFG.yearlyGoal}" min="1" />
+          <button class="btn btn-primary btn-sm" id="saveYearly">✓</button>
+        </div>
+      </div>
+      <div class="card-row">
+        <span class="cr-label">Anno corrente</span>
+        <span class="cr-val">${CFG.year}</span>
+      </div>
+      <div class="card-row">
+        <span class="cr-label">Mese corrente</span>
+        <span class="cr-val">${CFG.currentMonth}</span>
+      </div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title">Obiettivi per ruolo (mensile)</div>
+      ${ROLES.map(r => {
+        const sample = USERS.find(u => u.role === r);
+        return `<div class="card-row">
+          <span class="cr-label">${r}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input class="ie-inp role-obj" data-role="${r}" type="number" value="${sample ? sample.obj : 10}" min="1" />
+            <button class="btn btn-primary btn-sm role-obj-save" data-role="${r}">✓</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="sh"><div class="sh-title" style="font-size:15px">Obiettivi individuali</div></div>
+  <div class="goals-grid">
+    ${USERS.map(u => {
+      const cm = pcByUser(u.id, CFG.currentMonth);
+      const pct = Math.round(cm / u.obj * 100);
+      return `<div class="goal-card">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px">
+          <div style="width:28px;height:28px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#07080a">${avatarInitials(u.name)}</div>
+          <div>
+            <div class="gc-name">${u.name}</div>
+            <div class="gc-role">${u.role}</div>
+          </div>
+        </div>
+        <div class="gc-row">
+          <span class="gc-lbl">Obiettivo mensile</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input class="ie-inp user-obj" data-uid="${u.id}" type="number" value="${u.obj}" min="1" style="width:70px" />
+            <button class="btn btn-primary btn-sm user-obj-save" data-uid="${u.id}">✓</button>
+          </div>
+        </div>
+        <div class="gc-row">
+          <span class="gc-lbl">PC questo mese</span>
+          <span class="gc-val">${cm} / ${u.obj}</span>
+        </div>
+        <div class="prog-wrap" style="margin-top:4px"><div class="prog-fill" style="background:${pct>=100?'var(--green)':'var(--cyan)'};width:${Math.min(100,pct)}%"></div></div>
+        <div class="gc-pct" style="margin-top:5px">${pct}% obiettivo raggiunto</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // Save monthly goal
+  cont.querySelector('#saveMonthly').addEventListener('click', () => {
+    const v = parseInt(cont.querySelector('#gMonthly').value);
+    if (v > 0) { CFG.monthlyGoal = v; toast('Obiettivo mensile aggiornato', 'ok'); updateAll(); }
+  });
+  cont.querySelector('#saveYearly').addEventListener('click', () => {
+    const v = parseInt(cont.querySelector('#gYearly').value);
+    if (v > 0) { CFG.yearlyGoal = v; toast('Obiettivo annuale aggiornato', 'ok'); updateAll(); }
+  });
+  // Role obj
+  cont.querySelectorAll('.role-obj-save').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const role = btn.dataset.role;
+      const inp = cont.querySelector(`.role-obj[data-role="${role}"]`);
+      const v = parseInt(inp.value);
+      if (v > 0) {
+        USERS.filter(u => u.role === role).forEach(u => { u.obj = v; });
+        toast('Obiettivo ' + role + ' aggiornato', 'ok');
+        updateAll();
+        renderAdminTab('goals');
+      }
+    });
+  });
+  // Individual
+  cont.querySelectorAll('.user-obj-save').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const u = USERS.find(x => x.id === btn.dataset.uid);
+      const inp = cont.querySelector(`.user-obj[data-uid="${btn.dataset.uid}"]`);
+      const v = parseInt(inp.value);
+      if (u && v > 0) { u.obj = v; toast('Obiettivo ' + u.name + ' aggiornato', 'ok'); updateAll(); renderAdminTab('goals'); }
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
+   ADMIN — CONFIG TAB
+══════════════════════════════════════════ */
+function renderAdminConfig() {
+  const cont = document.getElementById('atab-config');
+  cont.innerHTML = `
+  <div class="sh"><div class="sh-title">Configurazione sistema</div></div>
+  <div class="cfg-grid" style="margin-bottom:20px">
+    <div class="cfg-card">
+      <div class="cfg-title">Sistema</div>
+      <div class="card-row"><span class="cr-label">Versione</span><span class="cr-val">v2.1.0</span></div>
+      <div class="card-row"><span class="cr-label">Anno corrente</span><span class="cr-val">${CFG.year}</span></div>
+      <div class="card-row"><span class="cr-label">Mese attivo</span><span class="cr-val">${CFG.currentMonth}</span></div>
+      <div class="card-row"><span class="cr-label">Totale PC inseriti</span><span class="cr-val">${ORDERS.length}</span></div>
+      <div class="card-row"><span class="cr-label">Utenti registrati</span><span class="cr-val">${USERS.length}</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title">Parametri mensili</div>
+      <div class="card-row">
+        <span class="cr-label">Mese corrente</span>
+        <select class="form-select" id="cfgCurrMonth" style="width:auto">
+          ${CFG.months.map(m=>`<option ${m===CFG.currentMonth?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="card-row" style="margin-top:8px">
+        <span class="cr-label">Imposta come mese attivo</span>
+        <button class="btn btn-primary btn-sm" id="setCurrMonth">✓ Applica</button>
+      </div>
+      <div class="card-row">
+        <span class="cr-label">Obiettivo mensile team</span>
+        <span class="cr-val">${CFG.monthlyGoal} PC</span>
+      </div>
+      <div class="card-row">
+        <span class="cr-label">Obiettivo annuale team</span>
+        <span class="cr-val">${CFG.yearlyGoal} PC</span>
+      </div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title">Feature flags</div>
+      <div class="card-row"><span class="cr-label">Classifica pubblica</span><div class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+      <div class="card-row"><span class="cr-label">Notifiche inserimento</span><div class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+      <div class="card-row"><span class="cr-label">Storico pubblico</span><div class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+      <div class="card-row"><span class="cr-label">Grafici live</span><div class="tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+      <div class="card-row"><span class="cr-label">Modalità manutenzione</span><div class="tog off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title">Statistiche anno corrente</div>
+      ${CFG.months.map(m => {
+        const cnt = ordersInMonth(m).length;
+        const pct = Math.round(cnt/CFG.monthlyGoal*100);
+        return `<div class="card-row">
+          <span class="cr-label">${m}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:60px"><div class="prog-wrap"><div class="prog-fill" style="background:${pct>=100?'var(--green)':'var(--cyan)'};width:${Math.min(100,pct)}%"></div></div></div>
+            <span class="cr-val">${cnt} PC</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  cont.querySelector('#setCurrMonth').addEventListener('click', () => {
+    CFG.currentMonth = cont.querySelector('#cfgCurrMonth').value;
+    toast('Mese corrente aggiornato: ' + CFG.currentMonth, 'ok');
+    document.getElementById('tbMonth').textContent = CFG.currentMonth;
+    updateAll();
+  });
+
+  // ── DELETE PANEL ──
+  const delPanel = document.createElement('div');
+  delPanel.innerHTML = `
+  <div class="sh" style="margin-top:8px"><div class="sh-title" style="color:var(--red)">&#9888; Cancellazione dati</div></div>
+  <div style="background:var(--red2);border:1px solid rgba(224,92,114,.22);border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:rgba(224,92,114,.85);line-height:1.6">
+    Le operazioni di cancellazione sono <strong>irreversibili</strong>. Ogni eliminazione richiede la conferma tramite un codice di sicurezza monouso generato al momento.
+  </div>
+  <div class="cfg-grid">
+    <div class="cfg-card" style="border-color:rgba(224,92,114,.2)">
+      <div class="cfg-title" style="color:var(--red)">Cancella mese</div>
+      <div class="card-row">
+        <span class="cr-label">Mese da cancellare</span>
+        <select class="form-select" id="delMonthSel" style="width:auto">
+          ${CFG.months.map(m => '<option>' + m + '</option>').join('')}
+        </select>
+      </div>
+      <div class="card-row" style="margin-top:4px">
+        <span class="cr-label" id="delMonthCount" style="color:var(--text3)"></span>
+        <button class="btn btn-danger btn-sm" id="delMonthBtn">&#128465; Cancella mese</button>
+      </div>
+    </div>
+    <div class="cfg-card" style="border-color:rgba(224,92,114,.2)">
+      <div class="cfg-title" style="color:var(--red)">Cancella anno</div>
+      <div class="card-row"><span class="cr-label">Anno</span><span class="cr-val">${CFG.year}</span></div>
+      <div class="card-row">
+        <span class="cr-label" style="color:var(--text3)">${ordersInYear(CFG.year).length} PC totali nell'anno</span>
+        <button class="btn btn-danger btn-sm" id="delYearBtn">&#128465; Cancella anno ${CFG.year}</button>
+      </div>
+    </div>
+    <div class="cfg-card" style="border-color:rgba(224,92,114,.4);grid-column:1/-1">
+      <div class="cfg-title" style="color:var(--red)">&#9888;&#9888; Cancella TUTTI i dati</div>
+      <div style="font-size:12.5px;color:var(--text3);margin-bottom:14px;line-height:1.5">
+        Elimina permanentemente <strong style="color:var(--text)">${ORDERS.length} PC</strong> da tutti i mesi e anni. Utenti e obiettivi rimangono intatti.
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="btn btn-danger" id="delAllBtn" style="border-color:rgba(224,92,114,.5)">&#128128; Cancella tutti i dati</button>
+      </div>
+    </div>
+  </div>`;
+  cont.appendChild(delPanel);
+
+  const delMonthSel = cont.querySelector('#delMonthSel');
+  const delMonthCount = cont.querySelector('#delMonthCount');
+  const updateDelCount = () => {
+    const cnt = ordersInMonth(delMonthSel.value).length;
+    delMonthCount.textContent = cnt + ' PC in ' + delMonthSel.value;
+  };
+  updateDelCount();
+  delMonthSel.addEventListener('change', updateDelCount);
+
+  cont.querySelector('#delMonthBtn').addEventListener('click', () => {
+    const m = delMonthSel.value;
+    const cnt = ordersInMonth(m).length;
+    openSecurityConfirm(
+      'Cancella dati mese: ' + m,
+      'Stai per eliminare <strong>' + cnt + ' PC</strong> del mese <strong>' + m + '</strong>.<br>Questa operazione è irreversibile.',
+      () => {
+        ORDERS = ORDERS.filter(o => o.month !== m);
+        toast('Dati di ' + m + ' eliminati', 'info');
+        updateAll();
+        renderAdminTab('config');
+      },
+      false
+    );
+  });
+
+  cont.querySelector('#delYearBtn').addEventListener('click', () => {
+    const cnt = ordersInYear(CFG.year).length;
+    openSecurityConfirm(
+      'Cancella dati anno ' + CFG.year,
+      'Stai per eliminare <strong>' + cnt + ' PC</strong> dell\'anno <strong>' + CFG.year + '</strong>.<br>Questa operazione è irreversibile.',
+      () => {
+        ORDERS = ORDERS.filter(o => !o.month.endsWith(String(CFG.year)));
+        toast('Dati anno ' + CFG.year + ' eliminati', 'info');
+        updateAll();
+        renderAdminTab('config');
+      },
+      false
+    );
+  });
+
+  cont.querySelector('#delAllBtn').addEventListener('click', () => {
+    openSecurityConfirm(
+      'Cancella TUTTI i dati',
+      'Stai per eliminare <strong>tutti i ' + ORDERS.length + ' PC</strong> da ogni mese e anno.<br><br>Utenti e obiettivi rimarranno intatti.',
+      () => {
+        ORDERS = [];
+        CFG.months = [CFG.currentMonth];
+        toast('Tutti i dati eliminati', 'info');
+        updateAll();
+        renderAdminTab('config');
+      },
+      true
+    );
+  });
+}
+
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+/* ══════════════════════════════════════════
+   SECURITY CONFIRM MODAL
+══════════════════════════════════════════ */
+const SEC_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function genSecCode(extra) {
+  // extra-danger: 8 chars; normal: 6 chars
+  const len = extra ? 8 : 6;
+  let code = '';
+  for (let i = 0; i < len; i++) code += SEC_CHARS[Math.floor(Math.random() * SEC_CHARS.length)];
+  return code;
+}
+
+let _secCallback = null;
+
+function openSecurityConfirm(title, desc, onConfirm, extraDanger) {
+  _secCallback = onConfirm;
+  const code = genSecCode(extraDanger);
+  document.getElementById('secTitle').textContent = title;
+  document.getElementById('secDesc').innerHTML = desc;
+  document.getElementById('secCode').textContent = code;
+  document.getElementById('secInput').value = '';
+  document.getElementById('secError').style.opacity = '0';
+  document.getElementById('secInput').style.borderColor = '';
+
+  const warn = document.getElementById('secExtraWarn');
+  if (extraDanger) {
+    warn.style.display = 'block';
+    warn.innerHTML = '&#9888; Operazione ad alto rischio: stai eliminando <strong>tutti</strong> i dati storici. Il codice ha 8 caratteri.';
+  } else {
+    warn.style.display = 'none';
+  }
+
+  document.getElementById('secConfirm').dataset.code = code;
+  document.getElementById('secOverlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('secInput').focus(), 80);
+}
+
+function closeSecurityModal() {
+  document.getElementById('secOverlay').style.display = 'none';
+  _secCallback = null;
+}
+
+document.getElementById('secCancel').addEventListener('click', closeSecurityModal);
+document.getElementById('secOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSecurityModal(); });
+
+document.getElementById('secInput').addEventListener('input', e => {
+  // Live highlight match
+  const inp = e.target;
+  const expected = document.getElementById('secConfirm').dataset.code;
+  if (inp.value.toUpperCase() === expected) {
+    inp.style.borderColor = 'var(--green)';
+  } else {
+    inp.style.borderColor = '';
+  }
+});
+
+document.getElementById('secInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('secConfirm').click();
+});
+
+document.getElementById('secConfirm').addEventListener('click', () => {
+  const inp = document.getElementById('secInput');
+  const expected = document.getElementById('secConfirm').dataset.code;
+  const err = document.getElementById('secError');
+  if (inp.value.toUpperCase().trim() === expected) {
+    closeSecurityModal();
+    if (_secCallback) _secCallback();
+    _secCallback = null;
+  } else {
+    inp.style.borderColor = 'var(--red)';
+    err.style.opacity = '1';
+    inp.value = '';
+    setTimeout(() => { err.style.opacity = '0'; inp.style.borderColor = ''; }, 2200);
+  }
+});
+
+
+/* ══════════════════════════════════════════
+   ADMIN AUTH + GATE
+══════════════════════════════════════════ */
+function tryAdminLogin() {
+  const pwd = document.getElementById('gatePwd').value;
+  const inp = document.getElementById('gatePwd');
+  const err = document.getElementById('gateErr');
+  if (pwd === ADMIN_PWD) {
+    adminAuthed = true;
+    document.getElementById('adminGate').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminBadge').style.display = 'none';
+    err.classList.remove('show');
+    renderAdminTab('orders');
+    toast('Benvenuto, admin!', 'info');
+  } else {
+    inp.classList.add('err');
+    err.classList.add('show');
+    setTimeout(() => inp.classList.remove('err'), 320);
+    inp.value = '';
+  }
+}
+document.getElementById('gateBtn').addEventListener('click', tryAdminLogin);
+document.getElementById('gatePwd').addEventListener('keydown', e => { if (e.key === 'Enter') tryAdminLogin(); });
+
+/* ══════════════════════════════════════════
+   ADMIN TABS
+══════════════════════════════════════════ */
+function renderAdminTab(tab) {
+  document.querySelectorAll('.atab').forEach(t => t.classList.toggle('on', t.dataset.atab === tab));
+  ['orders','users','goals','config'].forEach(t => {
+    document.getElementById('atab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  currentAdminTab = tab;
+  if (tab === 'orders') renderAdminOrders();
+  else if (tab === 'users') renderAdminUsers();
+  else if (tab === 'goals') renderAdminGoals();
+  else if (tab === 'config') renderAdminConfig();
+}
+
+document.querySelectorAll('.atab').forEach(t => {
+  t.addEventListener('click', () => renderAdminTab(t.dataset.atab));
+});
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+const VIEW_TITLES = {
+  dashboard: 'Dashboard',
+  insert: 'Inserisci PC',
+  rank: 'Classifica',
+  history: 'Storico',
+  admin: 'Amministrazione',
+};
+
+function navigateTo(view) {
+  if (view === currentView) return;
+
+  // Reset admin on leave
+  if (currentView === 'admin' && view !== 'admin') {
+    adminAuthed = false;
+    document.getElementById('adminGate').style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('gatePwd').value = '';
+    document.getElementById('gateErr').classList.remove('show');
+    document.getElementById('adminBadge').style.display = '';
+  }
+
+  currentView = view;
+  document.querySelectorAll('.nav').forEach(n => n.classList.toggle('on', n.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'view-' + view));
+  document.getElementById('tbTitle').textContent = VIEW_TITLES[view] || view;
+
+  if (view === 'dashboard') setTimeout(renderDashboard, 30);
+  else if (view === 'rank') { rankMonth = CFG.currentMonth; setTimeout(renderRank, 30); }
+  else if (view === 'history') { histMonth = CFG.currentMonth; setTimeout(renderHistory, 30); }
+}
+
+document.querySelectorAll('.nav').forEach(n => {
+  n.addEventListener('click', () => navigateTo(n.dataset.view));
+});
+
+/* ══════════════════════════════════════════
+   RANK PERIOD TOGGLE
+══════════════════════════════════════════ */
+document.getElementById('rankPeriodMonth').addEventListener('click', () => {
+  rankPeriod = 'month';
+  rankMonth = CFG.currentMonth;
+  document.getElementById('rankPeriodMonth').classList.add('on');
+  document.getElementById('rankPeriodYear').classList.remove('on');
+  renderRank();
+});
+document.getElementById('rankPeriodYear').addEventListener('click', () => {
+  rankPeriod = 'year';
+  document.getElementById('rankPeriodYear').classList.add('on');
+  document.getElementById('rankPeriodMonth').classList.remove('on');
+  renderRank();
+});
+
+/* ══════════════════════════════════════════
+   SIDEBAR TOGGLE
+══════════════════════════════════════════ */
+document.getElementById('sbToggle').addEventListener('click', () => {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('col');
+  document.getElementById('sbToggle').textContent = sb.classList.contains('col') ? '›' : '‹';
+});
+
+/* ══════════════════════════════════════════
+   UPDATE ALL (after any data change)
+══════════════════════════════════════════ */
+function updateAll() {
+  document.getElementById('tbMonth').textContent = CFG.currentMonth;
+  if (currentView === 'dashboard') renderDashboard();
+  else if (currentView === 'rank') renderRank();
+  else if (currentView === 'history') renderHistory();
+  else if (currentView === 'admin' && adminAuthed) renderAdminTab(currentAdminTab);
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR USER (reflect first user as default context)
+══════════════════════════════════════════ */
+function setSidebarUser(u) {
+  document.getElementById('sbAva').textContent = avatarInitials(u.name);
+  document.getElementById('sbAva').style.background = u.color;
+  document.getElementById('sbUname').textContent = u.name;
+  document.getElementById('sbUrole').textContent = u.role;
+  document.getElementById('tbUser').textContent = 'Utente: ' + u.name;
+}
+
+// Update sidebar user when insert form user changes
+document.addEventListener('change', e => {
+  if (e.target && e.target.id === 'insUser') {
+    const u = userById(e.target.value);
+    if (u) setSidebarUser(u);
+  }
+});
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+populateInsertForm();
+setSidebarUser(USERS[0]);
+document.getElementById('tbMonth').textContent = CFG.currentMonth;
+renderDashboard();
+</script>
+</body>
+</html>
